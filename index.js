@@ -29,6 +29,12 @@ client.connect((err) => {
             res.send(result);
         });
     });
+
+    app.get("/events", (req, res) => {
+        eventsCollection.find({}).toArray((err, documents) => {
+            res.send(documents);
+        });
+    });
 });
 
 app.listen(port);
