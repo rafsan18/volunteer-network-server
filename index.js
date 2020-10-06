@@ -4,12 +4,20 @@ const cors = require("cors");
 const MongoClient = require("mongodb").MongoClient;
 require("dotenv").config();
 const ObjectId = require("mongodb").ObjectID;
+const admin = require("firebase-admin");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mypty.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+var serviceAccount = require("./configs/volunteer-network-b020a-firebase-adminsdk-q1apy-fe00324409.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.FIRE_DB,
+});
 
 const port = 5000;
 
@@ -29,8 +37,7 @@ client.connect((err) => {
     // Post
     app.post("/addEvents", (req, res) => {
         const event = req.body;
-        console.log(event);
-        eventsCollections.insertMany(event).then((result) => {
+        eventsCollections.insertOne(event).then((result) => {
             res.send(result);
         });
     });
@@ -44,9 +51,32 @@ client.connect((err) => {
 
     //Get
     app.get("/chosenEvent", (req, res) => {
-        chosenEventCollections.find({}).toArray((err, documents) => {
-            res.send(documents);
-        });
+        const bearer = req.headers.authorization;
+        if (bearer && bearer.startsWith("Bearer ")) {
+            const idToken = bearer.split(" ")[1];
+            admin
+                .auth()
+                .verifyIdToken(idToken)
+                .then(function (decodedToken) {
+                    const tokenEmail = decodedToken.email;
+                    const queryEmail = req.query.email;
+
+                    if (tokenEmail === queryEmail) {
+                        chosenEventCollections
+                            .find({ email: queryEmail })
+                            .toArray((err, documents) => {
+                                res.status(200).send(documents);
+                            });
+                    } else {
+                        res.status(401).send("un-authorized access");
+                    }
+                })
+                .catch(function (error) {
+                    res.status(401).send("un-authorized access");
+                });
+        } else {
+            res.status(401).send("un-authorized access");
+        }
     });
 
     app.get("/events", (req, res) => {
@@ -72,7 +102,7 @@ client.connect((err) => {
         chosenEventCollections
             .deleteOne({ _id: ObjectId(req.params.id) })
             .then((result) => {
-                console.log(result);
+                res.send(result.deletedCount > 0);
             });
     });
 });
