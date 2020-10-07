@@ -8,11 +8,16 @@
         "start:dev": "nodemon index.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rafsan18/volunteer-network-server.git"
+    },
     "author": "Rafsan",
     "license": "ISC",
-    "devDependencies": {
-        "nodemon": "^2.0.4"
+    "bugs": {
+        "url": "https://github.com/rafsan18/volunteer-network-server/issues"
     },
+    "homepage": "https://github.com/rafsan18/volunteer-network-server#readme",
     "dependencies": {
         "body-parser": "^1.19.0",
         "cors": "^2.8.5",
@@ -20,5 +25,8 @@
         "express": "^4.17.1",
         "firebase-admin": "^9.2.0",
         "mongodb": "^3.6.2"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.4"
     }
 }
