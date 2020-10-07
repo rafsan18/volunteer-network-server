@@ -50,6 +50,12 @@ client.connect((err) => {
     });
 
     //Get
+    app.get("/adminPanel", (req, res) => {
+        chosenEventCollections.find({}).toArray((err, documents) => {
+            res.status(200).send(documents);
+        });
+    });
+
     app.get("/chosenEvent", (req, res) => {
         const bearer = req.headers.authorization;
         if (bearer && bearer.startsWith("Bearer ")) {
@@ -99,6 +105,14 @@ client.connect((err) => {
 
     // Delete
     app.delete("/cancelEvent/:id", (req, res) => {
+        chosenEventCollections
+            .deleteOne({ _id: ObjectId(req.params.id) })
+            .then((result) => {
+                res.send(result.deletedCount > 0);
+            });
+    });
+
+    app.delete("/deleteEvent/:id", (req, res) => {
         chosenEventCollections
             .deleteOne({ _id: ObjectId(req.params.id) })
             .then((result) => {
