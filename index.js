@@ -38,7 +38,7 @@ client.connect((err) => {
     app.post("/addEvents", (req, res) => {
         const event = req.body;
         eventsCollections.insertOne(event).then((result) => {
-            res.send(result);
+            res.redirect("/");
         });
     });
 
