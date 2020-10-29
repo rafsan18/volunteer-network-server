@@ -38,3 +38,8 @@ Technologies Used:
     -   Cors
     -   DotEnv
     -   Firebase admin
+
+Deployment Environment:
+
+-   Server-side in Heroku
+-   Client-side in Firebase
